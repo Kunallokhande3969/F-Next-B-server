@@ -21,7 +21,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Set-Cookie']
 }));
-
 // ===== Body Parsers =====
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

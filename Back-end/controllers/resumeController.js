@@ -5,6 +5,8 @@ const pdf = require("pdf-parse");
 const { analyzeResumeWithGemini } = require("../utiles/geminiService");
 const ErorrHandler = require("../utiles/ErorrHandler");
 
+
+
 // ======================== RESUME MAIN ==============================
 exports.resume = catchAsyncErorrs(async (req, res, next) => {
   const { resume } = await Student.findById(req.id).exec();
@@ -276,6 +278,15 @@ exports.uploadAndAnalyze = async (req, res, next) => {
   console.log("req.body:", req.body);
 
   try {
+    // Check if file exists
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
+
+    // Check if job description exists
     if (!req.body.jobDescription?.trim()) {
       return res.status(400).json({
         success: false,
@@ -283,28 +294,49 @@ exports.uploadAndAnalyze = async (req, res, next) => {
       });
     }
 
-    const { text: resumeText } = await pdf(req.file.buffer);
-
-    if (!resumeText?.trim()) {
+    let resumeText;
+    try {
+      // Extract text from PDF
+      const data = await pdf(req.file.buffer);
+      resumeText = data.text;
+    } catch (pdfError) {
+      console.error("PDF Parse Error:", pdfError);
       return res.status(400).json({
         success: false,
-        message: "Invalid PDF content",
+        message: "Error reading PDF file. Please upload a valid PDF.",
       });
     }
 
+    // Check if PDF text is extracted
+    if (!resumeText?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "PDF is empty or cannot be read",
+      });
+    }
+
+    console.log("PDF Text extracted successfully, length:", resumeText.length);
+
+    // Analyze with Gemini
     const analysis = await analyzeResumeWithGemini(
       resumeText,
       req.body.jobDescription
     );
 
-    console.log("AI Analysis Response:", analysis);
+    console.log("AI Analysis completed successfully");
 
-    res.json({ success: true, analysis });
+    res.json({ 
+      success: true, 
+      analysis,
+      message: "Resume analyzed successfully" 
+    });
+    
   } catch (error) {
     console.error("Analysis error:", error);
     res.status(500).json({
       success: false,
-      message: "Analysis failed",
+      message: "Analysis failed: " + error.message,
     });
   }
 };
+

@@ -1,7 +1,6 @@
 import axios from "axios";
 
 
-
 const instance = axios.create({
   baseURL: "https://carreerhub.onrender.com",
   withCredentials: true,
@@ -10,6 +9,7 @@ const instance = axios.create({
     Accept: "application/json",
   },
 });
+
 
 // Request interceptor: guard localStorage access so this file is safe during SSR
 instance.interceptors.request.use(

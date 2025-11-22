@@ -43,7 +43,7 @@ const Page = ({ params }) => {
 
     try {
       const res = await axios.post(
-        `${"https://carreerhub.onrender.com"}/resume/analyze`,
+        `${"http://localhost:8080"}/resume/analyze`,
         formData,
         {
           headers: {

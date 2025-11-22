@@ -286,9 +286,7 @@ const StudentLayout = ({ children }) => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow">
-        {children}
-      </main>
+      <main className="flex-grow">{children}</main>
     </div>
   );
 };
