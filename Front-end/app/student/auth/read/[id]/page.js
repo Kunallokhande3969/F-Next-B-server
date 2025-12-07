@@ -53,7 +53,7 @@ const InternshipPage = ({ params }) => {
     try {
       const res = await axios.post(
         `${
-          "http://localhost:8080"
+          "https://carreerhub.onrender.com"
         }/resume/analyze`,
         formData,
         {
